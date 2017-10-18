@@ -1,7 +1,7 @@
 
-model="data/sample_proscript.pcl"
+model="data/sample_model_p-meanf0.pcl"
 vocabulary="data/vocabulary.pcl"
-input_proscript="data/AlGore2006.0003.pcl"
+input_proscript="data/sample_proscript.pcl"
 out_predictions="testout.txt"
 
 
