@@ -84,7 +84,6 @@ def load(file_path, minibatch_size, x, p=None, feature_a=None, feature_b=None, f
             p=p
         )
     elif num_semitone_features == 1:
-        print("burda")
         net = Model(
             rng=rng,
             x=x,
