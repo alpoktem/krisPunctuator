@@ -22,6 +22,8 @@ END = "<END>"
 UNK = "<UNK>"
 EMP = "<EMP>"
 
+PAUSE_FEATURE_NAME = 'pause_before'
+
 MAX_SEQUENCE_LENGTH = 50
 
 def read_proscript(filename):
@@ -32,9 +34,14 @@ def read_proscript(filename):
 		reader = csv.DictReader(f, delimiter='\t') # read rows into a dictionary format
 		for row in reader: # read a row as {column1: value1, column2: value2,...}
 			for (k,v) in row.items(): # go over each column name and value 
-				columns[k].append(v) # append the value into the appropriate list
-									 # based on column name k
-
+				if k == "word" or k == "punctuation":
+					columns[k].append(v) # append the value into the appropriate list
+				else:
+					try:
+						columns[k].append(float(v)) # real value
+					except ValueError:
+						print("ALARM:%s"%v)
+						columns[k].append(0.0)
 	return columns
 
 def checkArgument(argname, isFile=False, isDir=False):
@@ -69,7 +76,7 @@ def restore_unsequenced_test_data(test_data_path, word_vocabulary, predict_funct
 	semitone_bins = create_semitone_bins()
 
 	word_sequence = proscript_data['word'] + [END]
-	pause_sequence = convert_value_to_level_sequence(proscript_data['pause_before'], pause_bins) + [0]
+	pause_sequence = convert_value_to_level_sequence(proscript_data[PAUSE_FEATURE_NAME], pause_bins) + [0]
 	otherfeatures_sequences = [convert_value_to_level_sequence(proscript_data[feature_name], semitone_bins) + [0] for feature_name in semitone_feature_names]
 
 	i = 0
@@ -230,7 +237,7 @@ def main(options):
 		sys.exit("Too many features (for now)")
 
 	print("Loading model parameters...")
-	net, _ = models.load(model_file, 1, x, p, a, b, c, num_semitone_features=num_semitone_features)
+	net, _ = models.load(model_file, 1, x, p, feature_a=a, feature_b=b, feature_c=c, num_semitone_features=num_semitone_features)
 	inputs = [x] + [i for i in [p,a,b,c] if not i == None]
 
 	print("Building model...")
